@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 
 import florianburel.fr.myflickr.City.City;
+import florianburel.fr.myflickr.City.Localisation.Localiser;
 
 /**
  * Created by fl0 on 16/07/2014.
@@ -32,8 +33,12 @@ public class CityDAO extends SQLiteOpenHelper {
         return sInstance;
     }
 
+    private Context context;
+
     private CityDAO(Context context) {
         super(context, "Flickr.sqlite", null, CURRENT_DB_VERSION);
+        this.context = context;
+
     }
 
 
@@ -93,7 +98,8 @@ public class CityDAO extends SQLiteOpenHelper {
         return cities;
     }
 
-    public City createCity() {
+    public City createCity()
+    {
 
         int id = getMaxId() + 1;
 
@@ -111,9 +117,10 @@ public class CityDAO extends SQLiteOpenHelper {
 
         this.getWritableDatabase().insert("City", null, cv);
 
+        Localiser.getInstance(this.context).startLocalizingCity(city);
+
         return city;
     }
-
 
     public void updateCity(City city)
     {
@@ -131,7 +138,11 @@ public class CityDAO extends SQLiteOpenHelper {
         this.getWritableDatabase().delete("City", "id = " + city.getId(), null);
     }
 
-    public int getMaxId() {
+    /*
+    HELPER
+     */
+    private int getMaxId()
+    {
 
         String sql = "SELECT MAX(id) FROM City";
         Cursor c = this.getReadableDatabase().rawQuery(sql, null);
